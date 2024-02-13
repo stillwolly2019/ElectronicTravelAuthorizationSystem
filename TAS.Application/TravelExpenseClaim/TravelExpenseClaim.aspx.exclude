@@ -1,0 +1,688 @@
+﻿<%@ Page Title="Travel Expense Claim" Language="C#" MasterPageFile="~/MasterPage.master" AutoEventWireup="true" CodeFile="TravelExpenseClaim.aspx.cs" Inherits="TravelExpenseClaim_TravelExpenseClaim" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="head" runat="Server">
+    <script src="Upload.js"></script>
+    <script type="text/javascript">
+        function ConfirmDelete() {
+            return confirm("Are you sure you want to delete?");
+        }
+        function ConfirmDeleteExp() {
+            return confirm("Are you sure you want to delete travel expense?");
+        }
+        function ConfirmDeleteDSA() {
+            return confirm("Are you sure you want to delete DSA?");
+        }
+
+        function ConfirmDeleteAdv() {
+            return confirm("Are you sure you want to delete travel advance?");
+        }
+        function SaveValidationExp() {
+            var a = 0;
+            $(".ReqExp").each(function () {
+
+                if ($(this).val() == "" || $(this).val() == "00000000-0000-0000-0000-000000000000") {
+                    $(this).addClass("invalid");
+                    a = a + 1;
+                } else {
+                    $(this).removeClass("invalid");
+                }
+            });
+            if (a > 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        function SaveDSAValidation() {
+            var a = 0;
+            $(".ReqDSA").each(function () {
+                if ($(this).val() == "") {
+                    $(this).addClass("invalid");
+                    a = a + 1;
+                } else {
+                    $(this).removeClass("invalid");
+                }
+            });
+            if (a > 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        function SaveValidationAdv() {
+            var a = 0;
+            $(".ReqAdv").each(function () {
+                if ($(this).val() == "" || $(this).val() == "00000000-0000-0000-0000-000000000000") {
+                    $(this).addClass("invalid");
+                    a = a + 1;
+                } else {
+                    $(this).removeClass("invalid");
+                }
+            });
+            if (a > 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    </script>
+
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <ContentTemplate>
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Travel Expense Claim</h1>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-lg-12">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h4>Travel Authorization #: 
+                            <asp:Label ID="lblTANo" runat="server" Text="" Font-Bold="True"></asp:Label>
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        Travelers Name:
+                                        <asp:Label ID="lblTATravelerName" runat="server" Text="" Font-Bold="True"></asp:Label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        Purpose Of Travel:
+                                        <asp:Label ID="lblTAPurposeOfTravel" runat="server" Text="" Font-Bold="True"></asp:Label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        Security Clearance needed:
+                                        <asp:Label ID="lblSecurityClearance" runat="server" Text="" Font-Bold="True"></asp:Label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label>&nbsp;</label>
+                                    <asp:Button ID="btnDownload" runat="server" Text="Download to PDF" CssClass="form-control btn-primary" OnClick="btnDownload_Click" />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        Mode Of Travel:
+                                        <asp:Label ID="lblModeOfTravel" runat="server" Text="" Font-Bold="True"></asp:Label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        Travel Schema:
+                                        <asp:Label ID="lblTravelSchema" runat="server" Text="" Font-Bold="True"></asp:Label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        Security Training Completed:
+                                        <asp:Label ID="lblSecurityTraining" runat="server" Text="" Font-Bold="True"></asp:Label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            Travel Expense Claim 
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                 <div id="divStatus" class="col-lg-3" runat="server">
+                   <label>Status</label>
+                    <asp:DropDownList ID="ddlStatusCode" runat="server" Enabled="true" DataTextField="Description" DataValueField="Code" CssClass="form-control Req" AutoPostBack="true" OnSelectedIndexChanged="ddlStatusCode_SelectedIndexChanged" />
+                    </div>
+                             <div class="col-lg-3" id="RejectionReasonDiv" runat="server" style="display:none;">
+
+                         <div class="form-group">
+                         <label>Rejection Reason</label>
+                         <asp:ListBox ID="lstRejectionReason" runat="server" CssClass="form-control" Height="70px" Visible="false" SelectionMode="Multiple"></asp:ListBox>
+                                    </div>
+                    </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>&nbsp;</label>
+                                        <asp:Button ID="btnSaveStatus" CssClass="btn btn-success form-control" runat="server" Text="Save Status" OnClick="btnSaveStatus_Click" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <br />
+                                    <asp:Label ID="lblStatusMsg" runat="server" Text=""></asp:Label>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        Name of Claimant:
+                                        <asp:Label ID="lblNameOfClaimant" runat="server" Text="" Font-Underline="true" Font-Bold="true"></asp:Label><br />
+                                        <br />
+                                        <a style="font-size: 14px; font-weight: bold; text-decoration: underline" href="../TravelAuthorization/StaffTravelAuthorizations.aspx">Back to My Travel Authorizations</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label>Exchange rate</label>
+                                    <asp:TextBox ID="txtExchangeRate" CssClass="form-control" runat="server"></asp:TextBox>
+                                </div>
+                                
+                                
+                            </div>
+                            <div class="row" style="padding-top: 10px">
+                                <div class="col-lg-12">
+                                    <h4>SECTION 1 - Itinerary</h4>
+                                </div>
+                                <div class="col-lg-12">
+                                    <asp:Panel ID="PanelItenMessage" runat="server" CssClass="alert alert-success alert-dismissable" Visible="False">
+                                        <asp:Label ID="lblItenmsg" runat="server" Text=""></asp:Label>
+                                    </asp:Panel>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+
+                                        <asp:GridView ID="GVItinerary" CssClass="table table-bordered  table-hover" runat="server" AutoGenerateColumns="False" OnRowCreated="GVItinerary_RowCreated" ShowFooter="True" OnRowDataBound="GVItinerary_RowDataBound" DataKeyNames="TravelItineraryID,TECItineraryID" OnRowCommand="GVItinerary_RowCommand">
+                                            <Columns>
+                                                <asp:BoundField DataField="DepArr" HeaderText="City of Departure and Arrival" FooterText="TOTAL SECTION 1">
+                                                    <FooterStyle Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#FFFFCC" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="FromCity" HeaderText="City of Departure and Arrival">
+                                                    <HeaderStyle BackColor="#FFFFCC" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="FromLocationDate" HeaderText="Date (DD-MMM-YYYY)">
+                                                    <HeaderStyle BackColor="#FFFFCC" />
+                                                </asp:BoundField>
+                                                <asp:TemplateField HeaderText="Local Time (24hr)">
+                                                    <HeaderStyle BackColor="#FFFFCC" />
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtFromLocationTime" CssClass="form-control" runat="server" Text='<%# Eval("FromLocationTime") %>'></asp:TextBox>
+                                                        <asp:MaskedEditExtender runat="server" CultureDatePlaceholder="" CultureTimePlaceholder="" CultureDecimalPlaceholder="" CultureThousandsPlaceholder="" CultureDateFormat="" CultureCurrencySymbolPlaceholder="" CultureAMPMPlaceholder="" Century="2000" Enabled="True" TargetControlID="txtFromLocationTime" ID="txtFromLocationTime_MaskedEditExtender" Mask="99:99" MaskType="Time"></asp:MaskedEditExtender>
+                                                    </ItemTemplate>
+                                                </asp:TemplateField>
+                                                <asp:BoundField DataField="ModeOfTravelName" HeaderText="Mode Of Travel">
+                                                    <HeaderStyle BackColor="#FFFFCC" />
+                                                </asp:BoundField>
+                                                <asp:TemplateField HeaderText="No. kms (for Car)">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtNoOfKms" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("NoOfKms")), 2, MidpointRounding.AwayFromZero).ToString() %>'></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterStyle BackColor="#FFFFCC" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#FFFFCC" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField HeaderText="No. of Nights">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtNoOfDays" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("NoOfDays")), 2, MidpointRounding.AwayFromZero).ToString() %>' ReadOnly="true"></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblNoOfDaysTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField HeaderText="DSA Rate in USD">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtDSARate" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("DSARate")), 2, MidpointRounding.AwayFromZero).ToString()  %>' ReadOnly="true"></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblDSARateTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField HeaderText="Amount USD">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtAmount" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("RateAmount")), 2, MidpointRounding.AwayFromZero).ToString()  %>' ReadOnly="true"></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblAmountTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+
+                                                <asp:TemplateField HeaderText="Local Amount">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtAmountLocal" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("LocalAmount")), 2, MidpointRounding.AwayFromZero).ToString() %>' ReadOnly="true"></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblAmountLocalTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField>
+                                                    <ItemTemplate>
+                                                        <asp:ImageButton ID="ibDSABreakdown" runat="server" ImageUrl="~/images/Money.png" Width="31px" CommandName="Select" ToolTip="DSA Breakdown" CommandArgument='<%# Container.DisplayIndex %>' data-toggle="modal" data-target="#myModal" />
+                                                    </ItemTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                            </Columns>
+
+                                        </asp:GridView>
+                                        <asp:HiddenField ID="hfNoOfDaysTotal" runat="server" />
+                                        <asp:HiddenField ID="hfDSARateTotal" runat="server" />
+                                        <asp:HiddenField ID="hfAmountTotal" runat="server" />
+                                        <asp:HiddenField ID="hfRateAmountTotal" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <asp:Button ID="btnSaveItinerary" BackColor="#FFFFCC" ForeColor="#000000" CssClass="btn btn-warning form-control" runat="server" Text="Save Itinerary Times" OnClick="btnSaveItinerary_Click" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6"></div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <asp:Button ID="btnSaveItineraryDSA" CssClass="btn btn-info form-control" runat="server" Text="Save DSA Information" OnClick="btnSaveItineraryDSA_Click" Visible="False" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="height: 2px; background-color: #808080">
+                            </div>
+                            <div class="row" style="padding-top: 10px">
+                                <div class="col-lg-4">
+                                    <h4>SECTION 2 - Expenses</h4>
+                                </div>
+                                <div class="col-lg-8">
+                                    <label>Please attached all of your receipts</label>
+                                    <asp:Panel ID="pnlFile" runat="server">
+                                        <asp:ImageButton ID="ibView" runat="server" ImageUrl="~/images/document.png" Width="30px" ToolTip="View file" OnClick="ibView_Click" />
+                                        <asp:ImageButton ID="ibDelete" runat="server" ImageUrl="~/images/delete.png" Width="30px" ToolTip="Delete file" OnClick="ibDelete_Click" OnClientClick="return ConfirmDelete();" />
+                                    </asp:Panel>
+
+                                    <asp:AsyncFileUpload ID="fuAttachment" Width="100%" runat="server" CompleteBackColor="Green" OnClientUploadComplete="UploadComplete"
+                                        OnClientUploadError="UploadError" OnClientUploadStarted="StartUpload" OnUploadedComplete="ProcessUpload" ThrobberID="spanUploading" />
+                                    <p class="help-block">
+                                        <asp:Label ID="lblUploadMsg" runat="server"></asp:Label>
+                                    </p>
+
+                                    <asp:HiddenField ID="hfFileLoad" runat="server" Value="" />
+                                    <asp:HiddenField ID="hdnlblFileExt" runat="server" Value="" />
+                                    <asp:HiddenField ID="hdnNameOnly" runat="server" Value="" />
+                                </div>
+                                <div class="col-lg-12">
+                                    <asp:Panel ID="PanelExpMessage" runat="server" CssClass="alert alert-success alert-dismissable" Visible="False">
+                                        <asp:Label ID="lblExpMsg" runat="server" Text=""></asp:Label>
+                                    </asp:Panel>
+                                </div>
+                            </div>
+                            <div id="divExp" runat="server" class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Details of Expenditure</label>
+                                        <asp:TextBox ID="txtExpDetails" CssClass="form-control ReqExp" runat="server" MaxLength="500"></asp:TextBox>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Date (DD/MM/YYYY)</label>
+                                        <asp:TextBox ID="txtExpDate" CssClass="form-control ReqExp" runat="server" placeholder="DD/MM/YYYY"></asp:TextBox>
+                                        <asp:CalendarExtender ID="txtExpDate_CalendarExtender" runat="server" Enabled="True" TargetControlID="txtExpDate" Format="dd/MM/yyyy">
+                                        </asp:CalendarExtender>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Currency</label>
+                                        <asp:DropDownList ID="DDLExpCurr" CssClass="form-control ReqExp" runat="server" DataValueField="CurrencyID" DataTextField="CurrencyName"></asp:DropDownList>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>Amount</label>
+                                        <asp:TextBox ID="txtExpAmount" CssClass="form-control ReqExp" runat="server"></asp:TextBox>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1">
+                                    <label style="display: block">&nbsp;</label>
+                                    <asp:Button ID="btnAddExp" CssClass="btn btn-success form-control" OnClientClick="return SaveValidationExp();" runat="server" Text="Add" OnClick="btnAddExp_Click" />
+
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+
+                                        <asp:GridView ID="gvExpenses" CssClass="table table-bordered  table-hover" runat="server" AutoGenerateColumns="False" OnRowCreated="gvExpenses_RowCreated" ShowFooter="True" OnRowDataBound="gvExpenses_RowDataBound" OnRowDeleting="gvExpenses_RowDeleting" DataKeyNames="TECExpenditureID" OnRowCommand="gvExpenses_RowCommand">
+                                            <Columns>
+                                                <asp:BoundField DataField="ExpenditureDetails" HeaderText="Details of Expenditure" FooterText="TOTAL SECTION 2 (Note: Please provide receipts for all expenses claimed.)">
+                                                    <FooterStyle BackColor="#FFFFCC" Font-Bold="True" Width="300px" Wrap="false" />
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="300px" Wrap="false" />
+                                                    <ItemStyle Width="300px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="ExpenditureDate" HeaderText="Date">
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="150px" Wrap="false" />
+                                                    <ItemStyle Width="150px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="CurrencyName" HeaderText="Currency">
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="150px" Wrap="false" />
+                                                    <ItemStyle Width="150px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="ExpenseAmount" HeaderText="Amount">
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="100px" Wrap="false" />
+                                                    <ItemStyle Width="100px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:TemplateField HeaderText="Rate USD">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtRate" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("Rate")), 2, MidpointRounding.AwayFromZero).ToString() %>'></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField HeaderText="Amount USD">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtRateAmount" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("RateAmount")), 2, MidpointRounding.AwayFromZero).ToString() %>'></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblRateAmountTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+
+                                                <asp:TemplateField HeaderText="Local Amount">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtAmountLocal" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("LocalAmount")), 2, MidpointRounding.AwayFromZero).ToString() %>'></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblAmountLocalTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField>
+                                                    <ItemTemplate>
+                                                        <asp:LinkButton ID="ibDelete" runat="server" Width="25px" CommandName="Delete" ToolTip="Delete" CommandArgument='<%# Container.DisplayIndex %>' OnClientClick="return ConfirmDeleteExp();"><li class="fa fa-times" style="font-size:24px"></li></asp:LinkButton>
+                                                    </ItemTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                            </Columns>
+
+                                        </asp:GridView>
+                                        <asp:HiddenField ID="hfExpRateAmountTotal" runat="server" />
+                                        <asp:HiddenField ID="hfExpLocalAmountTotal" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-9">
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <asp:Button ID="btnSaveExpense" CssClass="btn btn-info form-control" runat="server" Text="Save Expense Changes" OnClick="btnSaveExpense_Click" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" style="height: 2px; background-color: #808080">
+                            </div>
+                            <div class="row" style="padding-top: 10px">
+                                <div class="col-lg-12">
+                                    <h4>SECTION 3 - Travel Advances</h4>
+                                </div>
+                                <div class="col-lg-12">
+                                    <asp:Panel ID="PanelAdvMessage" runat="server" CssClass="alert alert-success alert-dismissable" Visible="False">
+                                        <asp:Label ID="lblAdvMsg" runat="server" Text=""></asp:Label>
+                                    </asp:Panel>
+                                </div>
+                            </div>
+                            <div id="divAdv" runat="server" class="row" style="padding-top: 10px">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Paying Office (Location Code)</label>
+                                        <asp:TextBox ID="txtAdvPayOffice" CssClass="form-control ReqAdv" runat="server"></asp:TextBox>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Date Paid</label>
+                                        <asp:TextBox ID="txtAdvDate" CssClass="form-control ReqAdv" runat="server" placeholder="DD/MM/YYYY"></asp:TextBox>
+                                        <asp:CalendarExtender ID="CalendarExtender1" runat="server" Enabled="True" TargetControlID="txtAdvDate" Format="dd/MM/yyyy">
+                                        </asp:CalendarExtender>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Currency</label>
+                                        <asp:DropDownList ID="DDLAdvCurrency" CssClass="form-control ReqAdv" runat="server" DataValueField="CurrencyID" DataTextField="CurrencyName"></asp:DropDownList>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>Amount</label>
+                                        <asp:TextBox ID="txtAdvAmount" CssClass="form-control ReqAdv" runat="server"></asp:TextBox>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1">
+                                    <label style="display: block">&nbsp;</label>
+                                    <asp:Button ID="btnAddAdv" CssClass="btn btn-success form-control" OnClientClick="return SaveValidationAdv();" runat="server" Text="Add" OnClick="btnAddAdv_Click" />
+
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+
+                                        <asp:GridView ID="GVAdvances" CssClass="table table-bordered  table-hover" runat="server" AutoGenerateColumns="False" OnRowCreated="GVAdvances_RowCreated" ShowFooter="True" OnRowDataBound="GVAdvances_RowDataBound" OnRowDeleting="GVAdvances_RowDeleting" DataKeyNames="TECAdvancesID" OnRowCommand="GVAdvances_RowCommand">
+                                            <Columns>
+                                                <asp:BoundField DataField="PayOfficeCode" HeaderText="Paying Office (Location Code)" FooterText="TOTAL SECTION 3">
+                                                    <FooterStyle BackColor="#FFFFCC" Font-Bold="True" Width="300px" Wrap="false" />
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="300px" Wrap="false" />
+                                                    <ItemStyle Width="300px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="DatePaid" HeaderText="Date Paid">
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="150px" Wrap="false" />
+                                                    <ItemStyle Width="150px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="CurrencyName" HeaderText="Currency">
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="150px" Wrap="false" />
+                                                    <ItemStyle Width="150px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:BoundField DataField="AdvanceAmount" HeaderText="Amount">
+                                                    <HeaderStyle BackColor="#FFFFCC" Width="100px" Wrap="false" />
+                                                    <ItemStyle Width="100px" Wrap="false" />
+                                                </asp:BoundField>
+                                                <asp:TemplateField HeaderText="Rate USD">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtRate" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("Rate")), 2, MidpointRounding.AwayFromZero).ToString() %>'></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField HeaderText="Amount USD">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtRateAmount" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("RateAmount")), 2, MidpointRounding.AwayFromZero).ToString() %>'></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblRateAmountTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+
+                                                <asp:TemplateField HeaderText="Local Amount">
+                                                    <ItemTemplate>
+                                                        <asp:TextBox ID="txtAmountLocal" CssClass="form-control" runat="server" Text='<%# decimal.Round(Convert.ToDecimal(Eval("LocalAmount")), 2, MidpointRounding.AwayFromZero).ToString() %>'></asp:TextBox>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblAmountLocalTotal" runat="server"></asp:Label>
+                                                    </FooterTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" Font-Bold="True" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField>
+                                                    <ItemTemplate>
+                                                        <asp:LinkButton ID="ibDelete" runat="server" Width="25px" CommandName="Delete" ToolTip="Delete" CommandArgument='<%# Container.DisplayIndex %>' OnClientClick="return ConfirmDeleteAdv();"><li class="fa fa-times" style="font-size:24px"></li></asp:LinkButton>
+                                                    </ItemTemplate>
+                                                    <FooterStyle BackColor="#5AC0DE" />
+                                                    <HeaderStyle BackColor="#5AC0DE" />
+                                                </asp:TemplateField>
+                                            </Columns>
+
+                                        </asp:GridView>
+                                        <asp:HiddenField ID="hfAdvRateAmountTotal" runat="server" />
+                                        <asp:HiddenField ID="hfAdvLocalAmountTotal" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-9">
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <asp:Button ID="btnSaveAdvances" CssClass="btn btn-info form-control" runat="server" Text="Save Advances Changes" OnClick="btnSaveAdvances_Click" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <asp:HiddenField ID="hfDSAID" runat="server" Value="" />
+            <asp:HiddenField ID="hfDSATAID" runat="server" Value="" />
+        </ContentTemplate>
+        <Triggers>
+            <asp:PostBackTrigger ControlID="btnDownload" />
+            <asp:PostBackTrigger ControlID="ibView" />
+        </Triggers>
+    </asp:UpdatePanel>
+    <div class="modal fade" id="myModal" tabindex="-1" role="form" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width: auto;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Daily Subsistence Allowance (DSA) Breakdown</h4>
+                </div>
+                <asp:UpdatePanel ID="UpdatePanel2" runat="server">
+                    <ContentTemplate>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    Arriving to:
+                                                    <asp:Label ID="lblArr" runat="server" Text=""></asp:Label>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    On:
+                                                    <asp:Label ID="lblDate" runat="server" Text=""></asp:Label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <label>DSA Rate</label>
+                                                <asp:TextBox ID="txtDSARateDSA" CssClass="form-control ReqDSA" runat="server"></asp:TextBox>
+                                                <asp:RegularExpressionValidator ID="RegularExpressionValidator1" ControlToValidate="txtDSARateDSA" ValidationExpression="[\d]{1,4}([.][\d]{1,2})?" Display="Static" EnableClientScript="true" ForeColor="Red" ErrorMessage="Please enter numbers only" ValidationGroup="NumOnly" runat="server" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-green" id="Divrate" runat="server">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <asp:Panel ID="pnlDSAMsg" runat="server" CssClass="alert alert-success alert-dismissable" Visible="False">
+                                                        <asp:Label ID="lblDSAMsg" runat="server" Text=""></asp:Label>
+                                                    </asp:Panel>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label>No. Of Nights</label>
+                                                        <asp:TextBox ID="txtNoOfDaysDSA" CssClass="form-control ReqDSA" runat="server"></asp:TextBox>
+                                                        <asp:RegularExpressionValidator ID="RegularExpressionValidator2" ControlToValidate="txtNoOfDaysDSA" ValidationExpression="[\d]{1,4}([.][\d]{1,2})?" Display="Static" EnableClientScript="true" ForeColor="Red" ErrorMessage="Please enter numbers only" ValidationGroup="NumOnly" runat="server" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-5">
+                                                    <div class="form-group">
+                                                        <label>Percentage</label>
+                                                        <asp:TextBox ID="txtPercentageDSA" CssClass="form-control ReqDSA" runat="server"></asp:TextBox>
+                                                        <asp:RegularExpressionValidator ID="RegularExpressionValidator3" ControlToValidate="txtPercentageDSA" ValidationExpression="[\d]{1,4}([.][\d]{1,2})?" Display="Static" EnableClientScript="true" ForeColor="Red" ErrorMessage="Please enter numbers only" ValidationGroup="NumOnly" runat="server" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-1">
+                                                    <div class="form-group">
+                                                        <label>&nbsp;</label>
+                                                        <asp:LinkButton ID="lnkAdd" runat="server" OnClick="lnkAdd_Click" ValidationGroup="NumOnly" OnClientClick="return SaveDSAValidation();"><li class="fa fa-plus" style="font-size:26px"></li></asp:LinkButton>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table table-hover table-responsive">
+                                <asp:GridView ID="gvDSABreakdown" CssClass="table table-bordered  table-hover" runat="server" OnRowDataBound="gvDSABreakdown_RowDataBound" AutoGenerateColumns="False" AllowPaging="True" PageSize="5" OnPageIndexChanging="gvDSABreakdown_PageIndexChanging" OnRowCommand="gvDSABreakdown_RowCommand" OnRowDeleting="gvDSABreakdown_RowDeleting" DataKeyNames="TECItineraryDSAID,TECItineraryID">
+                                    <Columns>
+                                        <asp:BoundField DataField="NoOfDays" HeaderText="No Of Days" />
+                                        <asp:BoundField DataField="Percentage" HeaderText="Percentage" />
+                                        <asp:BoundField DataField="DSARate" HeaderText="DSA Rate" />
+                                        <asp:BoundField DataField="RateAmount" HeaderText="Amount (USD)" />
+                                        <asp:BoundField DataField="LocalAmount" HeaderText="Local Amount" />
+                                        <asp:TemplateField>
+                                            <ItemTemplate>
+                                                <asp:LinkButton ID="ibDelete" runat="server" Width="25px" CommandName="Delete" ToolTip="Delete" CommandArgument='<%# Container.DisplayIndex %>' OnClientClick="return ConfirmDeleteDSA();"><li class="fa fa-times" style="font-size:24px"></li></asp:LinkButton>
+                                            </ItemTemplate>
+                                        </asp:TemplateField>
+                                    </Columns>
+                                    <PagerSettings Mode="NumericFirstLast" FirstPageText="First" LastPageText="Last" />
+                                    <PagerStyle CssClass="PagingIOM" />
+                                </asp:GridView>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <asp:Label ID="lblActmsg" runat="server" Text="&nbsp;"></asp:Label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                        </div>
+                    </ContentTemplate>
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="GVItinerary" EventName="RowCommand" />
+                    </Triggers>
+                </asp:UpdatePanel>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+
+    </div>
+</asp:Content>
+

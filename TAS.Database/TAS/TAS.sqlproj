@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>TAS</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{4fbf8ec6-07ca-4a01-a3c3-cb22d5743629}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>TAS</RootNamespace>
+    <AssemblyName>TAS</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="TA\" />
+    <Folder Include="TA\Tables\" />
+    <Folder Include="TEC\" />
+    <Folder Include="TEC\Tables\" />
+    <Folder Include="Lkp\" />
+    <Folder Include="Lkp\Tables\" />
+    <Folder Include="Sec\" />
+    <Folder Include="Sec\Tables\" />
+    <Folder Include="Security\" />
+    <Folder Include="TA\Functions\" />
+    <Folder Include="dbo\" />
+    <Folder Include="dbo\Functions\" />
+    <Folder Include="Lkp\Stored Procedures\" />
+    <Folder Include="TA\Stored Procedures\" />
+    <Folder Include="Rpt\" />
+    <Folder Include="Rpt\Stored Procedures\" />
+    <Folder Include="Sec\Stored Procedures\" />
+    <Folder Include="TEC\Stored Procedures\" />
+    <Folder Include="Noti\" />
+    <Folder Include="Noti\Stored Procedures\" />
+    <Folder Include="Assemblies\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="TA\Tables\RejectionReason.sql" />
+    <Build Include="TA\Tables\WBS.sql" />
+    <Build Include="TEC\Tables\StatusChangeHistory.sql" />
+    <Build Include="TA\Tables\CheckList.sql" />
+    <Build Include="TA\Tables\TravelItinerary.sql" />
+    <Build Include="TEC\Tables\TECExpenditure.sql" />
+    <Build Include="Lkp\Tables\LookupsGroups.sql" />
+    <Build Include="TEC\Tables\TECAdvances.sql" />
+    <Build Include="Lkp\Tables\Lookups.sql" />
+    <Build Include="Sec\Tables\Pages.sql" />
+    <Build Include="Sec\Tables\RolesPermissions.sql" />
+    <Build Include="TEC\Tables\TECItineraryDSA.sql" />
+    <Build Include="Sec\Tables\UsersRoles.sql" />
+    <Build Include="Sec\Tables\Users.sql" />
+    <Build Include="Sec\Tables\Roles.sql" />
+    <Build Include="TA\Tables\TravelAuthorization.sql" />
+    <Build Include="TA\Tables\StatusChangeHistory.sql" />
+    <Build Include="TEC\Tables\TECItinerary.sql" />
+    <Build Include="TA\Tables\PrivateDeviation.sql" />
+    <Build Include="dbo\Functions\ufn_Split.sql" />
+    <Build Include="Lkp\Stored Procedures\GetTECRejectionReason.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelExpenseClaimAdvances.sql" />
+    <Build Include="TA\Stored Procedures\InsertUpdateTravelersInformation.sql" />
+    <Build Include="Rpt\Stored Procedures\PendingTA.sql" />
+    <Build Include="Rpt\Stored Procedures\PendingTASubscription.sql" />
+    <Build Include="TA\Stored Procedures\GetCheckList.sql" />
+    <Build Include="Lkp\Stored Procedures\SearchCity.sql" />
+    <Build Include="Lkp\Stored Procedures\GetCityByDescription.sql" />
+    <Build Include="Sec\Stored Procedures\ADLogin.sql" />
+    <Build Include="Sec\Stored Procedures\DeletePages.sql" />
+    <Build Include="Lkp\Stored Procedures\GetCheckList.sql" />
+    <Build Include="Sec\Stored Procedures\DeleteRoles.sql" />
+    <Build Include="Sec\Stored Procedures\DeleteRoleUsers.sql" />
+    <Build Include="Sec\Stored Procedures\DeleteUserRoles.sql" />
+    <Build Include="TA\Stored Procedures\InsertCheckList.sql" />
+    <Build Include="Sec\Stored Procedures\DeleteUsers.sql" />
+    <Build Include="Sec\Stored Procedures\Get_User_Pages.sql" />
+    <Build Include="TA\Stored Procedures\DeleteCheckList.sql" />
+    <Build Include="Sec\Stored Procedures\GetAllPages.sql" />
+    <Build Include="TA\Stored Procedures\GetCheckListByTAID.sql" />
+    <Build Include="Sec\Stored Procedures\GetAllRoles.sql" />
+    <Build Include="Sec\Stored Procedures\GetRolePages.sql" />
+    <Build Include="Sec\Stored Procedures\GetRoleUsers.sql" />
+    <Build Include="TA\Stored Procedures\UpdateAdvanceAndSecurity.sql" />
+    <Build Include="Sec\Stored Procedures\GetUserMenu.sql" />
+    <Build Include="Sec\Stored Procedures\GetUserRoles.sql" />
+    <Build Include="TA\Stored Procedures\GetTAStepByTravelAuthorizationID.sql" />
+    <Build Include="Sec\Stored Procedures\InsertUpdatePages.sql" />
+    <Build Include="Sec\Stored Procedures\InsertUpdateRoles.sql" />
+    <Build Include="TA\Stored Procedures\InsertUpdateTravelItinerary.sql" />
+    <Build Include="Rpt\Stored Procedures\TAsByWBS.sql" />
+    <Build Include="Sec\Stored Procedures\InsertUpdateUsers.sql" />
+    <Build Include="TEC\Stored Procedures\GetTECItineraryDSAByTECItineraryID.sql" />
+    <Build Include="Rpt\Stored Procedures\GetSupervisors.sql" />
+    <Build Include="Sec\Stored Procedures\InsertUsersRoles.sql" />
+    <Build Include="Rpt\Stored Procedures\TECPending.sql" />
+    <Build Include="Sec\Stored Procedures\PermissionsCheck.sql" />
+    <Build Include="TA\Stored Procedures\GetTravelAuthorizationByTravelAuthorizationNumber.sql" />
+    <Build Include="TEC\Stored Procedures\InsertUpdateTECItineraryDSA.sql" />
+    <Build Include="Sec\Stored Procedures\PermissionsToggle.sql" />
+    <Build Include="Rpt\Stored Procedures\AllTAsWithStatuses.sql" />
+    <Build Include="TEC\Stored Procedures\InsertEmptyTECItineraryDSA.sql" />
+    <Build Include="Sec\Stored Procedures\InsertNewUsers.sql" />
+    <Build Include="Sec\Stored Procedures\GetStaffMembersByDepartmentID.sql" />
+    <Build Include="Rpt\Stored Procedures\AllTAsWithStatusesByDates.sql" />
+    <Build Include="TEC\Stored Procedures\DeleteTECItineraryDSA.sql" />
+    <Build Include="TA\Stored Procedures\DuplicateTA.sql" />
+    <Build Include="TA\Stored Procedures\CheckDuplicatedTA.sql" />
+    <Build Include="TA\Stored Procedures\UpdateTravelAuthorizationIsComplete.sql" />
+    <Build Include="Sec\Stored Procedures\GetUserInfoByUserID.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelExpenseClaimCheckList.sql" />
+    <Build Include="TA\Stored Procedures\GetStaffTravelAuthorization.sql" />
+    <Build Include="Lkp\Stored Procedures\GetTECReturnedRejectionReason.sql" />
+    <Build Include="Lkp\Stored Procedures\SearchLookups.sql" />
+    <Build Include="Lkp\Stored Procedures\SearchLookupGroups.sql" />
+    <Build Include="Rpt\Stored Procedures\HistorySearchLog.sql" />
+    <Build Include="Lkp\Stored Procedures\InsertUpdateLookupsGroups.sql" />
+    <Build Include="Lkp\Stored Procedures\InsertUpdateLookups.sql" />
+    <Build Include="TEC\Stored Procedures\GetTECItineraryByTravelAuthorizationNumber.sql" />
+    <Build Include="Rpt\Stored Procedures\SubmittedTAsToHR.sql" />
+    <Build Include="Lkp\Stored Procedures\GetAllLookupsGroups.sql" />
+    <Build Include="TEC\Stored Procedures\CheckTravelIteneraryTime.sql" />
+    <Build Include="Rpt\Stored Procedures\PendingTAsToStaff.sql" />
+    <Build Include="Lkp\Stored Procedures\GetAllLookups.sql" />
+    <Build Include="TEC\Stored Procedures\GetTECExpenditureByTravelAuthorizationNumber.sql" />
+    <Build Include="TA\Stored Procedures\GetArrivalDateByTravelAuthorizationNumber.sql" />
+    <Build Include="Rpt\Stored Procedures\CompletedTAsToStaff.sql" />
+    <Build Include="Lkp\Stored Procedures\DeleteLookupsGroups.sql" />
+    <Build Include="TEC\Stored Procedures\GetTECAdvancesByTravelAuthorizationNumber.sql" />
+    <Build Include="Rpt\Stored Procedures\AllTECsWithStatusesByDates.sql" />
+    <Build Include="Rpt\Stored Procedures\Dashboard.sql" />
+    <Build Include="Lkp\Stored Procedures\DeleteLookups.sql" />
+    <Build Include="TEC\Stored Procedures\GetTECItineraryExchangeRateByTravelAuthorizationNumber.sql" />
+    <Build Include="Rpt\Stored Procedures\SubscriptionPendingTAs.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelExpenseClaimSubReport.sql" />
+    <Build Include="Lkp\Stored Procedures\CheckDuplicateLookups.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelExpenseClaimMain.sql" />
+    <Build Include="Lkp\Stored Procedures\CheckDuplicateLookupGroup.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelExpenseClaimTotals.sql" />
+    <Build Include="Lkp\Stored Procedures\GetAllLookupsList.sql" />
+    <Build Include="Sec\Stored Procedures\UpdateUsers.sql" />
+    <Build Include="Sec\Stored Procedures\CheckDuplicateRoles.sql" />
+    <Build Include="TEC\Stored Procedures\GetTECByTANumber.sql" />
+    <Build Include="TA\Stored Procedures\InsertUpdateWBS.sql" />
+    <Build Include="TA\Stored Procedures\GetTravelAuthorizationByTravelAuthorizationID.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelExpenseClaim.sql" />
+    <Build Include="Rpt\Stored Procedures\AllTAsByWBS.sql" />
+    <Build Include="Rpt\Stored Procedures\TASubmittedForMoreThan2Months.sql" />
+    <Build Include="TA\Stored Procedures\SearchTravelAuthorizationForManagers.sql" />
+    <Build Include="Rpt\Stored Procedures\GetWBSSubReport.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTECAdvances.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTECExpenditure.sql" />
+    <Build Include="Rpt\Stored Procedures\AllTECsWithStatuses.sql" />
+    <Build Include="TA\Stored Procedures\GetTAStatusByTAID.sql" />
+    <Build Include="Rpt\Stored Procedures\PendingTECsToStaff.sql" />
+    <Build Include="Rpt\Stored Procedures\TAIncomplete.sql" />
+    <Build Include="Rpt\Stored Procedures\TECComplete.sql" />
+    <Build Include="Rpt\Stored Procedures\TECIncomplete.sql" />
+    <Build Include="Rpt\Stored Procedures\SubscriptionTECPendingFor14Days.sql" />
+    <Build Include="Rpt\Stored Procedures\SubscriptionTECPendingFor30Days.sql" />
+    <Build Include="Sec\Stored Procedures\GetDepUsers.sql" />
+    <Build Include="Rpt\Stored Procedures\SubscriptionTECPendingFor2Months.sql" />
+    <Build Include="Rpt\Stored Procedures\ReminderTECPendingFor14Days.sql" />
+    <Build Include="Rpt\Stored Procedures\ReminderTECPendingForMonth.sql" />
+    <Build Include="Sec\Stored Procedures\ADSingleSignOn.sql" />
+    <Build Include="Rpt\Stored Procedures\ReminderTECPendingFor2Months.sql" />
+    <Build Include="Sec\Stored Procedures\ADLogOut.sql" />
+    <Build Include="Sec\Stored Procedures\SearchUsers.sql" />
+    <Build Include="TA\Stored Procedures\InsertTADocumentNumber.sql" />
+    <Build Include="Rpt\Stored Procedures\SubscriptionIncompleteTAs.sql" />
+    <Build Include="Rpt\Stored Procedures\TAsList.sql" />
+    <Build Include="TA\Stored Procedures\SearchTravelAuthorization.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelAuthorizationFormWBS.sql" />
+    <Build Include="TA\Stored Procedures\GetWBSByTravelAuthorizationID.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelExpenseClaimExpenses.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTravelIteneraryTime.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelAuthorizationFormTravelMode.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelAuthorizationFormTripSchema.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelAuthorizationFormTravelItinerary.sql" />
+    <Build Include="Lkp\Stored Procedures\GetRejectionReason.sql" />
+    <Build Include="TA\Stored Procedures\GetTravelItineraryByTravelAuthorizationNumber.sql" />
+    <Build Include="TA\Stored Procedures\DeleteTravelathorization.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelAuthorizationForm.sql" />
+    <Build Include="Sec\Stored Procedures\GetAllUsers.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTECItineraryNoOfKms.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTECItineraryDSA.sql" />
+    <Build Include="TA\Stored Procedures\InsertTAStatus.sql" />
+    <Build Include="TA\Stored Procedures\DeleteTravelItinerary.sql" />
+    <Build Include="TA\Stored Procedures\InsertRejectionReason.sql" />
+    <Build Include="TA\Stored Procedures\DeleteWBS.sql" />
+    <Build Include="TA\Stored Procedures\DeleteRejectionReason.sql" />
+    <Build Include="TEC\Stored Procedures\InsertTECExpenditure.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTECExpenditureRates.sql" />
+    <Build Include="TA\Stored Procedures\GetRejectionReason.sql" />
+    <Build Include="TEC\Stored Procedures\DeleteTECExpenditure.sql" />
+    <Build Include="TA\Stored Procedures\SearchTravelAuthorization_Old.sql" />
+    <Build Include="TA\Stored Procedures\GetStaffTravelAuthorization_old.sql" />
+    <Build Include="TA\Stored Procedures\SearchTravelAuthorizationForManagers_old.sql" />
+    <Build Include="TA\Stored Procedures\UpdateTravelAuthorizationStatus.sql" />
+    <Build Include="TA\Stored Procedures\GetStatusHistory.sql" />
+    <Build Include="TEC\Stored Procedures\DeleteTECAdvances.sql" />
+    <Build Include="Noti\Stored Procedures\SendEmail.sql" />
+    <Build Include="TEC\Stored Procedures\InsertTECAdvances.sql" />
+    <Build Include="Rpt\Stored Procedures\TECList.sql" />
+    <Build Include="Sec\Stored Procedures\GetRoleNameByUserID.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTECAdvancesRates.sql" />
+    <Build Include="Noti\Stored Procedures\SendWelcomeEmail.sql" />
+    <Build Include="TEC\Stored Procedures\UpdateTECStatus.sql" />
+    <Build Include="TA\Stored Procedures\UpdateTravelItinerary.sql" />
+    <Build Include="TA\Stored Procedures\GetPrivateDeviation.sql" />
+    <Build Include="TA\Stored Procedures\UpdateWBS.sql" />
+    <Build Include="Security\Lkp.sql" />
+    <Build Include="Security\Noti.sql" />
+    <Build Include="Security\Rpt.sql" />
+    <Build Include="Security\Sec.sql" />
+    <Build Include="Security\TA.sql" />
+    <Build Include="Security\TEC.sql" />
+    <Build Include="Security\RoleMemberships.sql" />
+    <Build Include="TA\Stored Procedures\InsertUpdateTravelAuthorization.sql" />
+    <Build Include="Rpt\Stored Procedures\TravelAuthorizationByStatus.sql" />
+    <Build Include="Rpt\Stored Procedures\TECInAdminFor30Days.sql" />
+    <Build Include="Rpt\Stored Procedures\SubscriptionIncompleteTECs.sql" />
+    <Build Include="Rpt\Stored Procedures\SubscriptionCompleteTECs.sql" />
+    <Build Include="Rpt\Stored Procedures\NewTravelExpenseClaimSubReport.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assemblies\GroupConcat.dll" />
+    <None Include="TAS.DEV.publish.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="ActiveDirectoryUsers">
+      <DefaultValue>ActiveDirectoryUsers</DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="TAConnection">
+  <ConnectionProperties>
+    <Extension>SQL</Extension>
+<<<<<<< .mine
+    <ConnectString>Data Source=172.25.134.9;Initial Catalog=TravelAuthorizationSystem</ConnectString>
+||||||| .r4960
+    <ConnectString>Data Source=AMMSTGSVR\STG;Initial Catalog=TravelAuthorizationSystem</ConnectString>
+    <IntegratedSecurity>true</IntegratedSecurity>
+=======
+    <ConnectString>Data Source=AMMSTGDB\STG;Initial Catalog=TravelAuthorizationSystem</ConnectString>
+    <IntegratedSecurity>true</IntegratedSecurity>
+>>>>>>> .r5036
+  </ConnectionProperties>
+  <DataSourceID>9aebc528-3a80-435e-b377-9b42648ca09b</DataSourceID>
+</RptDataSource>

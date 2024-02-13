@@ -1,0 +1,5 @@
+﻿CREATE SCHEMA [TEC]
+    AUTHORIZATION [dbo];
+
+
+

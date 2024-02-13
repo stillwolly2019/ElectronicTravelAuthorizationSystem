@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ToolsVersion="2.0">
+  <State>$base64$PFNvdXJjZUNvbnRyb2xJbmZvIHhtbG5zOnhzZD0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEiIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiIHhtbG5zOmRkbDI9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDAzL2VuZ2luZS8yIiB4bWxuczpkZGwyXzI9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDAzL2VuZ2luZS8yLzIiIHhtbG5zOmRkbDEwMF8xMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDA4L2VuZ2luZS8xMDAvMTAwIiB4bWxuczpkZGwyMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDEwL2VuZ2luZS8yMDAiIHhtbG5zOmRkbDIwMF8yMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDEwL2VuZ2luZS8yMDAvMjAwIiB4bWxuczpkZGwzMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDExL2VuZ2luZS8zMDAiIHhtbG5zOmRkbDMwMF8zMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDExL2VuZ2luZS8zMDAvMzAwIiB4bWxuczpkZGw0MDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDEyL2VuZ2luZS80MDAiIHhtbG5zOmRkbDQwMF80MDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDEyL2VuZ2luZS80MDAvNDAwIiB4bWxuczpkd2Q9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vRGF0YVdhcmVob3VzZS9EZXNpZ25lci8xLjAiPg0KICA8RW5hYmxlZD5mYWxzZTwvRW5hYmxlZD4NCiAgPFByb2plY3ROYW1lPjwvUHJvamVjdE5hbWU+DQogIDxBdXhQYXRoPjwvQXV4UGF0aD4NCiAgPExvY2FsUGF0aD48L0xvY2FsUGF0aD4NCiAgPFByb3ZpZGVyPjwvUHJvdmlkZXI+DQo8L1NvdXJjZUNvbnRyb2xJbmZvPg==</State>
+  <DataSources>
+    <ProjectItem>
+      <Name>TAConnection.rds</Name>
+      <FullPath>TAConnection.rds</FullPath>
+    </ProjectItem>
+  </DataSources>
+  <DataSets />
+  <Reports>
+    <ProjectItem>
+      <Name>AllTAsByWBS.rdl</Name>
+      <FullPath>AllTAsByWBS.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>Dashboard.rdl</Name>
+      <FullPath>Dashboard.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>EmployeeDashboard.rdl</Name>
+      <FullPath>EmployeeDashboard.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>HistorySearchLog.rdl</Name>
+      <FullPath>HistorySearchLog.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>SubmittedTAs.rdl</Name>
+      <FullPath>SubmittedTAs.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>SubmittedTAsForMoreThan2Months.rdl</Name>
+      <FullPath>SubmittedTAsForMoreThan2Months.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TA Pending.rdl</Name>
+      <FullPath>TA Pending.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TAIncomplete.rdl</Name>
+      <FullPath>TAIncomplete.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TAsByStatusAndDates.rdl</Name>
+      <FullPath>TAsByStatusAndDates.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TasByWBS.rdl</Name>
+      <FullPath>TasByWBS.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TAsList.rdl</Name>
+      <FullPath>TAsList.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TAStatus.rdl</Name>
+      <FullPath>TAStatus.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TEC List.rdl</Name>
+      <FullPath>TEC List.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TEC on the same status for 1 Month.rdl</Name>
+      <FullPath>TEC on the same status for 1 Month.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TEC Pending For 1 Month.rdl</Name>
+      <FullPath>TEC Pending For 1 Month.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TEC Pending For 14 Days.rdl</Name>
+      <FullPath>TEC Pending For 14 Days.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TEC Pending For 2 Months.rdl</Name>
+      <FullPath>TEC Pending For 2 Months.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TEC Pending.rdl</Name>
+      <FullPath>TEC Pending.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TECCompletion.rdl</Name>
+      <FullPath>TECCompletion.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TECIncomplete.rdl</Name>
+      <FullPath>TECIncomplete.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TECItinerarySubReport.rdl</Name>
+      <FullPath>TECItinerarySubReport.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TECsByStatusAndDates.rdl</Name>
+      <FullPath>TECsByStatusAndDates.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>TECStatus.rdl</Name>
+      <FullPath>TECStatus.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>Travel Authorization Form.rdl</Name>
+      <FullPath>Travel Authorization Form.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>Travel Expense Claim.rdl</Name>
+      <FullPath>Travel Expense Claim.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>WBSSubReport.rdl</Name>
+      <FullPath>WBSSubReport.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>SSDashboard.rdl</Name>
+      <FullPath>SSDashboard.rdl</FullPath>
+    </ProjectItem>
+  </Reports>
+  <Configurations>
+    <Configuration>
+      <Name>Debug</Name>
+      <Platform>Win32</Platform>
+      <Options>
+        <OutputPath>bin\Debug</OutputPath>
+        <TargetServerVersion>SSRS2008R2</TargetServerVersion>
+        <TargetServerURL>http://jubw2k12srv12/ReportServer</TargetServerURL>
+        <TargetFolder>TA Reports</TargetFolder>
+        <TargetDataSourceFolder>Data Sources</TargetDataSourceFolder>
+        <TargetDatasetFolder>Datasets</TargetDatasetFolder>
+        <TargetReportPartFolder>Report Parts</TargetReportPartFolder>
+      </Options>
+    </Configuration>
+    <Configuration>
+      <Name>DebugLocal</Name>
+      <Platform>Win32</Platform>
+      <Options>
+        <OutputPath>bin\DebugLocal</OutputPath>
+        <TargetServerVersion>SSRS2008R2</TargetServerVersion>
+        <TargetFolder>TASReports</TargetFolder>
+        <TargetDataSourceFolder>Data Sources</TargetDataSourceFolder>
+        <TargetDatasetFolder>Datasets</TargetDatasetFolder>
+        <TargetReportPartFolder>Report Parts</TargetReportPartFolder>
+      </Options>
+    </Configuration>
+    <Configuration>
+      <Name>Release</Name>
+      <Platform>Win32</Platform>
+      <Options>
+        <OutputPath>bin\Release</OutputPath>
+        <TargetServerVersion>SSRS2008R2</TargetServerVersion>
+        <TargetServerURL>http://ammdbsvr01/reportserver</TargetServerURL>
+        <TargetFolder>TA Reports</TargetFolder>
+        <TargetDataSourceFolder>Data Sources</TargetDataSourceFolder>
+        <TargetDatasetFolder>Datasets</TargetDatasetFolder>
+        <TargetReportPartFolder>Report Parts</TargetReportPartFolder>
+      </Options>
+    </Configuration>
+  </Configurations>
+</Project>

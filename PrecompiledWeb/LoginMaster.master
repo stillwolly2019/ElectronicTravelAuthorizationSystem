@@ -1,0 +1,79 @@
+﻿<%@ master language="C#" autoeventwireup="true" inherits="LoginMaster, App_Web_gze2ivvq" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="asp" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <!-- jQuery -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+     <!-- Custom Theme JavaScript -->
+    <script src="dist/js/sb-admin-2.js"></script>
+
+    <link href="~/css/Site.css" rel="stylesheet" />
+
+    <link href="~/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="~/dist/css/sb-admin-2.css" rel="stylesheet" />
+
+    <!-- Morris Charts CSS -->
+    <link href="~/bower_components/morrisjs/morris.css" rel="stylesheet" />
+
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+
+    <form id="form1" runat="server">
+        <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server"></asp:ToolkitScriptManager>
+        <div id="wrapper" style="padding-top: 150px">
+            <%--<div>
+                <div style="padding: 0px 50px 50px 50px; margin-top: -100px; position: relative">
+                    <img id="logo" src="images/iom_logo.png" alt="IOM Template" style="width: 120px;" />
+                </div>
+
+            </div>--%>
+
+            <%--<div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-3">
+                    </div>
+                    <div class="col-lg-6" style="text-align: center; padding: 5px">
+                        <img id="RSC" src="images/IOM-UN_65th-Logo_Blue_EN.jpg" alt="IOM" style="width: 250px;" />
+                    </div>
+                    <div class="col-lg-3">
+                    </div>
+                </div>
+            </div>--%>
+
+            <!-- /.navbar-static-side -->
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+
+       <div style="text-align: center">
+            Copyright &copy; International Organization for Migration IOM.
+        </div>
+
+    </form>
+
+</body>
+</html>

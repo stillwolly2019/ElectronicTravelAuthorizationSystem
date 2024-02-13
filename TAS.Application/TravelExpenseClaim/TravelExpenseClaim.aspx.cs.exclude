@@ -1,0 +1,1155 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using Microsoft.Reporting.WebForms;
+using System.Configuration;
+using System.Text.RegularExpressions;
+public partial class TravelExpenseClaim_TravelExpenseClaim : AuthenticatedPageClass
+{
+    Business.TravelAuthorization TA = new Business.TravelAuthorization();
+    Business.TravelExpenseClaim TEC = new Business.TravelExpenseClaim();
+
+    Business.Lookups Lookup = new Business.Lookups();
+    Business.Media Media = new Business.Media();
+    Globals g = new Globals();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        try
+        {
+            Objects.User ui = (Objects.User)Session["userinfo"];
+            hfAdvLocalAmountTotal.Value = "0";
+            hfAdvRateAmountTotal.Value = "0";
+            hfAmountTotal.Value = "0";
+            hfDSARateTotal.Value = "0";
+            hfExpLocalAmountTotal.Value = "0";
+            hfExpRateAmountTotal.Value = "0";
+            hfNoOfDaysTotal.Value = "0";
+            hfRateAmountTotal.Value = "0";
+            if (!IsPostBack)
+            {
+                //btnSaveItineraryDSA.Visible = this.CanAmend;
+                btnSaveExpense.Visible = this.CanAmend;
+                btnSaveAdvances.Visible = this.CanAmend;
+                ddlStatusCode.Enabled = this.CanAmend;
+               // txtComments.Enabled = this.CanAmend;
+                btnSaveStatus.Enabled = this.CanAmend;
+                DataSet ds = new DataSet();
+                TA.GetTravelAuthorizationByTravelAuthorizationNumber(ref ds, Decrypt(Request["TANO"]));
+                ViewState["TAUserID"] = ds.Tables[0].Rows[0]["UserID"].ToString();
+                ViewState["TAID"] = ds.Tables[0].Rows[0]["TravelAuthorizationID"].ToString();
+                if (ViewState["TAUserID"].ToString() == ui.User_Id.ToString())
+                {
+                    btnSaveItinerary.Visible = this.CanEdit;
+                    divExp.Visible = this.CanEdit;
+                    divAdv.Visible = this.CanEdit;
+                }
+                else
+                {
+                    btnSaveItinerary.Visible = false;
+                    divExp.Visible = false;
+                    divAdv.Visible = false;
+                }
+                DataTable dtM = new DataTable();
+                string TravelAuthorizationID = ds.Tables[0].Rows[0][0].ToString(); ;
+                Media.GetTECExpensesFilesTAID(TravelAuthorizationID, ref dtM);
+
+                if (dtM.Rows.Count == 0 && ViewState["TAUserID"].ToString() == ui.User_Id.ToString())
+                {
+                    fuAttachment.Style.Clear();
+                    pnlFile.Style.Clear();
+                    fuAttachment.Style.Add("display", "block");
+                    pnlFile.Style.Add("display", "none");
+                }
+                else if (dtM.Rows.Count > 0 && ViewState["TAUserID"].ToString() == ui.User_Id.ToString())
+                {
+                    fuAttachment.Style.Clear();
+                    pnlFile.Style.Clear();
+                    fuAttachment.Style.Add("display", "none");
+                    pnlFile.Style.Add("display", "block");
+                }
+                else if (dtM.Rows.Count > 0 && ViewState["TAUserID"].ToString() != ui.User_Id.ToString())
+                {
+                    fuAttachment.Style.Clear();
+                    pnlFile.Style.Clear();
+                    ibDelete.Style.Clear();
+                    fuAttachment.Style.Add("display", "none");
+                    pnlFile.Style.Add("display", "block");
+                    ibDelete.Style.Add("display", "none");
+                }
+                else
+                {
+                    fuAttachment.Style.Clear();
+                    pnlFile.Style.Clear();
+                    fuAttachment.Style.Add("display", "none");
+                    pnlFile.Style.Add("display", "none");
+                }
+               
+                FillDDLs();
+                FillGrids(true);
+                txtExchangeRate.Text = ConfigurationManager.AppSettings["ExchangeRate"];
+                txtExchangeRate.Enabled = this.CanAmend;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+            Response.Redirect("~/TravelAuthorization/StaffTravelAuthorizations.aspx");
+        }
+    }
+    void FillDDLs()
+    {
+        try
+        {
+            DataSet dsLookup = new DataSet();
+            Lookup.GetAllLookupsList(ref dsLookup);
+
+
+            ddlStatusCode.DataSource = dsLookup.Tables[5];
+            ddlStatusCode.DataBind();
+
+
+            DDLAdvCurrency.DataSource = dsLookup.Tables[7];
+            DDLAdvCurrency.DataBind();
+
+            DDLExpCurr.DataSource = dsLookup.Tables[7];
+            DDLExpCurr.DataBind();
+
+            DataTable dtReasons = new DataTable();
+            Lookup.GetRejectionReason(ref dtReasons);
+            lstRejectionReason.DataSource = dtReasons;
+            lstRejectionReason.DataTextField = "Description";
+            lstRejectionReason.DataValueField = "LookupsID";
+
+            lstRejectionReason.DataBind();
+
+
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    public void FillGrids(bool Clearlbl)
+    {
+        try
+        {
+            string TravelAuthorizationNumber = Decrypt(Request["TANO"]);
+            DataSet ds = new DataSet();
+            TA.GetTravelAuthorizationByTravelAuthorizationNumber(ref ds, TravelAuthorizationNumber);
+            ViewState["TAUserID"] = ds.Tables[0].Rows[0]["UserID"].ToString();
+            ViewState["Status"] = ds.Tables[1].Rows[0]["StatusCode"].ToString();
+            lblTANo.Text = ds.Tables[0].Rows[0]["TravelAuthorizationNumber"].ToString();
+            lblTATravelerName.Text = ds.Tables[0].Rows[0]["TravelersName"].ToString();
+            lblTAPurposeOfTravel.Text = ds.Tables[0].Rows[0]["PurposeOfTravel"].ToString();
+            lblModeOfTravel.Text = ds.Tables[0].Rows[0]["ModeOfTravel"].ToString();
+            lblTravelSchema.Text = ds.Tables[0].Rows[0]["TravelSchema"].ToString();
+            lblSecurityClearance.Text = ds.Tables[0].Rows[0]["SecurityClearanceNeeded"].ToString();
+            lblSecurityTraining.Text = ds.Tables[0].Rows[0]["SecurityTrainingCompleted"].ToString();
+            lblNameOfClaimant.Text = "&nbsp;" + ds.Tables[0].Rows[0]["LastName"].ToString() + ", " + ds.Tables[0].Rows[0]["FirstName"].ToString() + "&nbsp;";
+
+            ddlStatusCode.SelectedValue = ds.Tables[1].Rows[0]["StatusCode"].ToString();
+            if (ds.Tables[1].Rows[0]["StatusCode"].ToString().ToUpper() == "INC".ToUpper())
+            {
+                lstRejectionReason.Visible = true;
+                RejectionReasonDiv.Style.Add("display", "block");
+                FIllRejectionReason(ds.Tables[0].Rows[0]["TravelAuthorizationID"].ToString());
+            }
+
+          //  txtComments.Text = ds.Tables[1].Rows[0]["Comments"].ToString();
+            if (ddlStatusCode.SelectedValue != "" && ddlStatusCode.SelectedItem.Text == "Completed")
+            {
+                Divrate.Style.Add("Display", "none");
+                //gvDSABreakdown.Visible = false;
+            }
+            else
+            {
+                Divrate.Style.Add("Display", "block");
+                // gvDSABreakdown.Visible = true;
+            }
+            GVItinerary.DataSource = ds.Tables[1];
+            GVItinerary.DataBind();
+
+            gvExpenses.DataSource = ds.Tables[3];
+            gvExpenses.DataBind();
+
+            GVAdvances.DataSource = ds.Tables[4];
+            GVAdvances.DataBind();
+
+            if (ViewState["Status"].ToString().ToUpper() == "COM")
+            {
+                ddlStatusCode.Enabled = false;
+              //  txtComments.Enabled = false;
+                btnSaveStatus.Enabled = false;
+                btnSaveAdvances.Visible = false;
+                btnSaveExpense.Visible = false;
+                btnSaveItineraryDSA.Visible = false;
+                btnSaveItinerary.Visible = false;
+                divAdv.Visible = false;
+                divExp.Visible = false;
+
+
+                TA.GetTravelAuthorizationByTravelAuthorizationNumber(ref ds, Decrypt(Request["TANO"]));
+                DataTable dtM = new DataTable();
+                string TravelAuthorizationID = ds.Tables[0].Rows[0][0].ToString(); ;
+                Media.GetTECExpensesFilesTAID(TravelAuthorizationID, ref dtM);
+                if (dtM.Rows.Count > 0)
+                {
+                    fuAttachment.Style.Clear();
+                    pnlFile.Style.Clear();
+                    ibDelete.Style.Clear();
+                    fuAttachment.Style.Add("display", "none");
+                    pnlFile.Style.Add("display", "block");
+                    ibDelete.Style.Add("display", "none");
+                }
+                else
+                {
+                    fuAttachment.Style.Clear();
+                    pnlFile.Style.Clear();
+                    ibDelete.Style.Clear();
+                    fuAttachment.Style.Add("display", "none");
+                    pnlFile.Style.Add("display", "none");
+                    ibDelete.Style.Add("display", "none");
+                }
+            }
+            if (Clearlbl)
+                lblStatusMsg.Text = "";
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void GVItinerary_RowCreated(object sender, GridViewRowEventArgs e)
+    {
+        try
+        {
+            if (e.Row.RowType == DataControlRowType.Header)
+            {
+                GridView HeaderGrid = (GridView)sender;
+                GridViewRow HeaderGridRow = new GridViewRow(0, 0, DataControlRowType.Header, DataControlRowState.Insert);
+                TableCell HeaderCell = new TableCell();
+                HeaderCell.Text = "<b>Itinerary</b>";
+                HeaderCell.ColumnSpan = 6;
+                HeaderCell.BackColor = ColorTranslator.FromHtml("#FFFFCC");
+                HeaderGridRow.Cells.Add(HeaderCell);
+
+                HeaderCell = new TableCell();
+                HeaderCell.Text = "<b><span style=color:red;>For Accounting User Only</span><br>Daily Subsistence Allowance (DSA)</b>";
+                HeaderCell.ColumnSpan = 5;
+                HeaderCell.BackColor = ColorTranslator.FromHtml("#5AC0DE");
+                HeaderGridRow.Cells.Add(HeaderCell);
+
+
+                GVItinerary.Controls[0].Controls.AddAt(0, HeaderGridRow);
+
+
+                e.Row.Cells[0].ColumnSpan = 2;
+                //now make up for the colspan from cell2
+                e.Row.Cells.RemoveAt(1);
+            }
+
+            if (e.Row.RowType == DataControlRowType.Footer)
+            {
+                e.Row.Cells[0].ColumnSpan = 5;
+                e.Row.Cells[0].BackColor = ColorTranslator.FromHtml("#FFFFCC");
+                //now make up for the colspan from cell2
+                e.Row.Cells.RemoveAt(1);
+                e.Row.Cells.RemoveAt(1);
+                e.Row.Cells.RemoveAt(1);
+                e.Row.Cells.RemoveAt(1);
+                Label lblAmount, lblNoOfDays, lblAmountLocalTotal;
+                lblAmount = (Label)e.Row.FindControl("lblAmountTotal");
+                lblNoOfDays = (Label)e.Row.FindControl("lblNoOfDaysTotal");
+                lblAmountLocalTotal = (Label)e.Row.FindControl("lblAmountLocalTotal");
+                lblAmount.Text = hfAmountTotal.Value;
+                lblNoOfDays.Text = hfNoOfDaysTotal.Value;
+                lblAmountLocalTotal.Text = hfRateAmountTotal.Value;
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void GVItinerary_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        try
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                TextBox txtAmount, txtNoOfDays, txtDSARate, txtAmountLocal, txtNoOfKms, txtFromLocationTime;
+                ImageButton ibDSABreakdown;
+                ibDSABreakdown = (ImageButton)e.Row.FindControl("ibDSABreakdown");
+
+
+
+
+                txtAmount = (TextBox)e.Row.FindControl("txtAmount");
+                txtNoOfDays = (TextBox)e.Row.FindControl("txtNoOfDays");
+                txtDSARate = (TextBox)e.Row.FindControl("txtDSARate");
+                txtAmountLocal = (TextBox)e.Row.FindControl("txtAmountLocal");
+                txtNoOfKms = (TextBox)e.Row.FindControl("txtNoOfKms");
+                txtFromLocationTime = (TextBox)e.Row.FindControl("txtFromLocationTime");
+                hfNoOfDaysTotal.Value = (Convert.ToDecimal(hfNoOfDaysTotal.Value) + Convert.ToDecimal(txtNoOfDays.Text)).ToString();
+                hfAmountTotal.Value = (Convert.ToDecimal(hfAmountTotal.Value) + Convert.ToDecimal(txtAmount.Text)).ToString();
+                hfRateAmountTotal.Value = (Convert.ToDecimal(hfRateAmountTotal.Value) + Convert.ToDecimal(txtAmountLocal.Text)).ToString();
+                ibDSABreakdown.Visible = this.CanAmend;
+                if (e.Row.Cells[0].Text.Trim() == "Dep.")
+                {
+                    txtAmount.Text = "";
+                    txtNoOfDays.Text = "";
+                    txtDSARate.Text = "";
+                    txtAmountLocal.Text = "";
+                    txtNoOfKms.Text = "";
+                    txtAmount.Visible = false;
+                    txtNoOfDays.Visible = false;
+                    txtDSARate.Visible = false;
+                    txtAmountLocal.Visible = false;
+                    txtNoOfKms.Visible = false;
+                    ibDSABreakdown.Visible = false;
+                    e.Row.Cells[5].BackColor = ColorTranslator.FromHtml("#dddddd");
+                    e.Row.Cells[6].BackColor = ColorTranslator.FromHtml("#dddddd");
+                    e.Row.Cells[7].BackColor = ColorTranslator.FromHtml("#dddddd");
+                    e.Row.Cells[8].BackColor = ColorTranslator.FromHtml("#dddddd");
+                    e.Row.Cells[9].BackColor = ColorTranslator.FromHtml("#dddddd");
+                    e.Row.Cells[10].BackColor = ColorTranslator.FromHtml("#dddddd");
+
+                }
+                else
+                {
+                    TEC.InsertEmptyTECItineraryDSA(GVItinerary.DataKeys[Convert.ToInt16(e.Row.RowIndex)].Values["TravelItineraryID"].ToString());
+                }
+                txtAmount.Enabled = this.CanAmend;
+                txtNoOfDays.Enabled = this.CanAmend;
+                txtDSARate.Enabled = this.CanAmend;
+                txtAmountLocal.Enabled = this.CanAmend;
+
+                Objects.User ui = (Objects.User)Session["userinfo"];
+                if (ViewState["TAUserID"].ToString() == ui.User_Id.ToString())
+                {
+                    txtFromLocationTime.Enabled = this.CanEdit;
+                    txtNoOfKms.Enabled = this.CanEdit;
+                }
+                else
+                {
+                    txtFromLocationTime.Enabled = false;
+                    txtNoOfKms.Enabled = false;
+                }
+                if (ViewState["Status"].ToString().ToUpper() == "1310FDC8-EE09-4FE0-9B5B-DD421FC7EFAB")
+                {
+                    txtAmount.Enabled = false;
+                    txtNoOfDays.Enabled = false;
+                    txtDSARate.Enabled = false;
+                    txtAmountLocal.Enabled = false;
+                    txtFromLocationTime.Enabled = false;
+                    txtNoOfKms.Enabled = false;
+                }
+
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void gvExpenses_RowCreated(object sender, GridViewRowEventArgs e)
+    {
+        try
+        {
+            if (e.Row.RowType == DataControlRowType.Footer)
+            {
+                e.Row.Cells[0].ColumnSpan = 4;
+                e.Row.Cells[0].BackColor = ColorTranslator.FromHtml("#FFFFCC");
+                e.Row.Cells.RemoveAt(1);
+                e.Row.Cells.RemoveAt(1);
+                e.Row.Cells.RemoveAt(1);
+                Label lblRateAmountTotal, lblAmountLocalTotal;
+                lblRateAmountTotal = (Label)e.Row.FindControl("lblRateAmountTotal");
+                lblAmountLocalTotal = (Label)e.Row.FindControl("lblAmountLocalTotal");
+                lblRateAmountTotal.Text = hfExpRateAmountTotal.Value;
+                lblAmountLocalTotal.Text = hfExpLocalAmountTotal.Value;
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void gvExpenses_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        try
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                TextBox txtRate, txtRateAmount, txtAmountLocal;
+                txtRate = (TextBox)e.Row.FindControl("txtRate");
+                txtRateAmount = (TextBox)e.Row.FindControl("txtRateAmount");
+                txtAmountLocal = (TextBox)e.Row.FindControl("txtAmountLocal");
+                hfExpRateAmountTotal.Value = (Convert.ToDecimal(hfExpRateAmountTotal.Value) + Convert.ToDecimal(txtRateAmount.Text)).ToString();
+                hfExpLocalAmountTotal.Value = (Convert.ToDecimal(hfExpLocalAmountTotal.Value) + Convert.ToDecimal(txtAmountLocal.Text)).ToString();
+                txtRate.Enabled = this.CanAmend;
+                txtRateAmount.Enabled = this.CanAmend;
+                txtAmountLocal.Enabled = this.CanAmend;
+                LinkButton ibDelete;
+                ibDelete = (LinkButton)e.Row.FindControl("ibDelete");
+                Objects.User ui = (Objects.User)Session["userinfo"];
+                if (ViewState["TAUserID"].ToString() == ui.User_Id.ToString())
+                {
+                    ibDelete.Visible = this.CanEdit;
+                }
+                else
+                {
+                    ibDelete.Visible = false;
+                }
+                if (ViewState["Status"].ToString().ToUpper() == "1310FDC8-EE09-4FE0-9B5B-DD421FC7EFAB")
+                {
+                    ibDelete.Visible = false;
+                    txtRate.Enabled = false;
+                    txtRateAmount.Enabled = false;
+                    txtAmountLocal.Enabled = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void GVAdvances_RowCreated(object sender, GridViewRowEventArgs e)
+    {
+        try
+        {
+            if (e.Row.RowType == DataControlRowType.Footer)
+            {
+                e.Row.Cells[0].ColumnSpan = 4;
+                e.Row.Cells[0].BackColor = ColorTranslator.FromHtml("#FFFFCC");
+                e.Row.Cells.RemoveAt(1);
+                e.Row.Cells.RemoveAt(1);
+                e.Row.Cells.RemoveAt(1);
+                Label lblRateAmountTotal, lblAmountLocalTotal;
+                lblRateAmountTotal = (Label)e.Row.FindControl("lblRateAmountTotal");
+                lblAmountLocalTotal = (Label)e.Row.FindControl("lblAmountLocalTotal");
+                lblRateAmountTotal.Text = hfAdvRateAmountTotal.Value;
+                lblAmountLocalTotal.Text = hfAdvLocalAmountTotal.Value;
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void GVAdvances_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        try
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                TextBox txtRate, txtRateAmount, txtAmountLocal;
+                txtRate = (TextBox)e.Row.FindControl("txtRate");
+                txtRateAmount = (TextBox)e.Row.FindControl("txtRateAmount");
+                txtAmountLocal = (TextBox)e.Row.FindControl("txtAmountLocal");
+                hfAdvRateAmountTotal.Value = (Convert.ToDecimal(hfAdvRateAmountTotal.Value) + Convert.ToDecimal(txtRateAmount.Text)).ToString();
+                hfAdvLocalAmountTotal.Value = (Convert.ToDecimal(hfAdvLocalAmountTotal.Value) + Convert.ToDecimal(txtAmountLocal.Text)).ToString();
+                txtRate.Enabled = this.CanAmend;
+                txtRateAmount.Enabled = this.CanAmend;
+                txtAmountLocal.Enabled = this.CanAmend;
+                LinkButton ibDelete;
+                ibDelete = (LinkButton)e.Row.FindControl("ibDelete");
+                Objects.User ui = (Objects.User)Session["userinfo"];
+                if (ViewState["TAUserID"].ToString() == ui.User_Id.ToString())
+                {
+                    ibDelete.Visible = this.CanEdit;
+                }
+                else
+                {
+                    ibDelete.Visible = false;
+                }
+                if (ViewState["Status"].ToString().ToUpper() == "1310FDC8-EE09-4FE0-9B5B-DD421FC7EFAB")
+                {
+                    ibDelete.Visible = false;
+                    txtRate.Enabled = false;
+                    txtRateAmount.Enabled = false;
+                    txtAmountLocal.Enabled = false;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void gvExpenses_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+    }
+    protected void GVAdvances_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+    }
+    protected void btnSaveItinerary_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            for (int i = 0; i <= GVItinerary.Rows.Count - 1; i++)
+            {
+                TextBox txtTime = new TextBox();
+                TextBox txtNoOfKms = new TextBox();
+                float NoOfKms;
+                TimeSpan interval;
+                txtTime = (TextBox)GVItinerary.Rows[i].FindControl("txtFromLocationTime");
+                txtNoOfKms = (TextBox)GVItinerary.Rows[i].FindControl("txtNoOfKms");
+                if (float.TryParse(txtNoOfKms.Text, out NoOfKms) == false)
+                {
+                    NoOfKms = 0;
+                }
+                if (TimeSpan.TryParse(txtTime.Text, out interval) == false)
+                {
+                    txtTime.CssClass += " invalid";
+                }
+                else
+                {
+                    if (TimeSpan.Parse(txtTime.Text).TotalHours > 24)
+                    {
+                        txtTime.CssClass += " invalid";
+                    }
+                    else
+                    {
+                        txtTime.CssClass.Replace("invalid", "");
+                        TEC.UpdateTravelIteneraryTime(GVItinerary.DataKeys[i].Values["TravelItineraryID"].ToString(), TimeSpan.Parse(txtTime.Text), GVItinerary.Rows[i].Cells[0].Text);
+                    }
+                }
+                if (txtNoOfKms.Visible)
+                {
+                    TEC.UpdateTECItineraryNoOfKms(GVItinerary.DataKeys[i].Values["TravelItineraryID"].ToString(), NoOfKms);
+                }
+            }
+            FillGrids(true);
+            PanelItenMessage.Visible = true;
+            lblItenmsg.Text = "Travel Itinerary times has been saved successfully";
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void btnSaveItineraryDSA_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            for (int i = 0; i <= GVItinerary.Rows.Count - 1; i++)
+            {
+                TextBox txtNoOfDays, txtDSARate, txtAmount, txtAmountLocal;
+                float NoOfDays, DSARate, Amount, AmounLocal;
+                txtNoOfDays = (TextBox)GVItinerary.Rows[i].FindControl("txtNoOfDays");
+                txtDSARate = (TextBox)GVItinerary.Rows[i].FindControl("txtDSARate");
+                txtAmount = (TextBox)GVItinerary.Rows[i].FindControl("txtAmount");
+                txtAmountLocal = (TextBox)GVItinerary.Rows[i].FindControl("txtAmountLocal");
+                if (float.TryParse(txtNoOfDays.Text, out NoOfDays) == false)
+                    NoOfDays = 0;
+                if (float.TryParse(txtDSARate.Text, out DSARate) == false)
+                    DSARate = 0;
+                if (float.TryParse(txtAmount.Text, out Amount) == false)
+                    Amount = 0;
+                if (float.TryParse(txtAmountLocal.Text, out AmounLocal) == false)
+                    AmounLocal = 0;
+                if (txtNoOfDays.Visible)
+                    TEC.UpdateTECItineraryDSA(GVItinerary.DataKeys[i].Values["TravelItineraryID"].ToString(), NoOfDays, DSARate, Amount, AmounLocal);
+            }
+            FillGrids(true);
+            PanelItenMessage.Visible = true;
+            lblItenmsg.Text = "Travel DSA has been saved successfully";
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void btnAddExp_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (g.CheckDate(txtExpDate.Text))
+            {
+                txtExpDate.CssClass = "form-control ReqExp";
+                float Amount;
+                if (float.TryParse(txtExpAmount.Text, out Amount) == true)
+                {
+                    txtExpAmount.CssClass = "form-control ReqExp";
+                    TEC.InsertTECExpenditure(lblTANo.Text, Convert.ToDateTime(txtExpDate.Text), txtExpDetails.Text, DDLExpCurr.SelectedValue.ToString(), Amount);
+                    PanelExpMessage.Visible = true;
+                    lblExpMsg.Text = "Travel Expense has been added successfully";
+                    txtExpDetails.Text = "";
+                    DDLExpCurr.SelectedIndex = -1;
+                    txtExpDate.Text = "";
+                    txtExpAmount.Text = "";
+                }
+                else
+                {
+                    txtExpAmount.CssClass += " invalid";
+                }
+            }
+            else
+            {
+                txtExpDate.CssClass += " invalid";
+            }
+            FillGrids(true);
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void gvExpenses_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        try
+        {
+            if (e.CommandName == "Delete")
+            {
+                TEC.DeleteTECExpenditure(gvExpenses.DataKeys[Convert.ToInt16(e.CommandArgument)].Values["TECExpenditureID"].ToString());
+                PanelExpMessage.Visible = true;
+                lblExpMsg.Text = "Travel Expense has been deleted successfully";
+                FillGrids(true);
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+
+    protected void btnSaveExpense_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            for (int i = 0; i <= gvExpenses.Rows.Count - 1; i++)
+            {
+                TextBox txtRate, txtRateAmount, txtAmountLocal;
+                float Rate, RateAmount, AmounLocal, Amount, LocalExch;
+                txtRate = (TextBox)gvExpenses.Rows[i].FindControl("txtRate");
+                txtRateAmount = (TextBox)gvExpenses.Rows[i].FindControl("txtRateAmount");
+                txtAmountLocal = (TextBox)gvExpenses.Rows[i].FindControl("txtAmountLocal");
+                if (float.TryParse(txtRate.Text, out Rate) == false)
+                    Rate = 0;
+                if (float.TryParse(txtRateAmount.Text, out RateAmount) == false)
+                    RateAmount = 0;
+                if (float.TryParse(txtAmountLocal.Text, out AmounLocal) == false)
+                    AmounLocal = 0;
+                if (float.TryParse(gvExpenses.Rows[i].Cells[3].Text, out Amount) == false)
+                    Amount = 0;
+                if (float.TryParse(txtExchangeRate.Text, out LocalExch) == false)
+                    LocalExch = 0;
+                RateAmount = Amount / Rate;
+                AmounLocal = RateAmount * LocalExch;
+                TEC.UpdateTECExpenditureRates(gvExpenses.DataKeys[i].Values["TECExpenditureID"].ToString(), Rate, RateAmount, AmounLocal);
+            }
+            FillGrids(true);
+            PanelExpMessage.Visible = true;
+            lblExpMsg.Text = "Travel Expense rates has been saved successfully";
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void btnAddAdv_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (g.CheckDate(txtAdvDate.Text))
+            {
+                txtAdvDate.CssClass = "form-control ReqAdv";
+                float Amount;
+                if (float.TryParse(txtAdvAmount.Text, out Amount) == true)
+                {
+                    txtAdvAmount.CssClass = "form-control ReqAdv";
+                    TEC.InsertTECAdvances(lblTANo.Text, txtAdvPayOffice.Text, Convert.ToDateTime(txtAdvDate.Text), DDLAdvCurrency.SelectedValue.ToString(), Amount);
+                    PanelAdvMessage.Visible = true;
+                    lblAdvMsg.Text = "Travel Expense has been added successfully";
+                    txtAdvPayOffice.Text = "";
+                    DDLAdvCurrency.SelectedIndex = -1;
+                    txtAdvDate.Text = "";
+                    txtAdvAmount.Text = "";
+                }
+                else
+                {
+                    txtAdvAmount.CssClass += " invalid";
+                }
+            }
+            else
+            {
+                txtAdvDate.CssClass += " invalid";
+            }
+            FillGrids(true);
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+
+
+    protected void btnSaveAdvances_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            for (int i = 0; i <= GVAdvances.Rows.Count - 1; i++)
+            {
+                TextBox txtRate, txtRateAmount, txtAmountLocal;
+                float Rate, RateAmount, AmounLocal, Amount, LocalExch;
+                txtRate = (TextBox)GVAdvances.Rows[i].FindControl("txtRate");
+                txtRateAmount = (TextBox)GVAdvances.Rows[i].FindControl("txtRateAmount");
+                txtAmountLocal = (TextBox)GVAdvances.Rows[i].FindControl("txtAmountLocal");
+                if (float.TryParse(txtRate.Text, out Rate) == false)
+                    Rate = 0;
+                if (float.TryParse(txtRateAmount.Text, out RateAmount) == false)
+                    RateAmount = 0;
+                if (float.TryParse(txtAmountLocal.Text, out AmounLocal) == false)
+                    AmounLocal = 0;
+                if (float.TryParse(GVAdvances.Rows[i].Cells[3].Text, out Amount) == false)
+                    Amount = 0;
+                if (float.TryParse(txtExchangeRate.Text, out LocalExch) == false)
+                    LocalExch = 0;
+                RateAmount = Amount / Rate;
+                AmounLocal = RateAmount * LocalExch;
+                TEC.UpdateTECAdvancesRates(GVAdvances.DataKeys[i].Values["TECAdvancesID"].ToString(), Rate, RateAmount, AmounLocal);
+            }
+            FillGrids(true);
+            PanelAdvMessage.Visible = true;
+            lblAdvMsg.Text = "Travel Advances rates has been saved successfully";
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void GVAdvances_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        try
+        {
+            if (e.CommandName == "Delete")
+            {
+                TEC.DeleteTECAdvances(GVAdvances.DataKeys[Convert.ToInt16(e.CommandArgument)].Values["TECAdvancesID"].ToString());
+                PanelAdvMessage.Visible = true;
+                lblAdvMsg.Text = "Travel Advances has been deleted successfully";
+                FillGrids(true);
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+  
+    protected void btnDownload_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            ReportViewer viewer = new ReportViewer();
+            //viewer.ZoomMode = ZoomMode.Percent;
+            //viewer.ProcessingMode = Microsoft.Reporting.WebForms.ProcessingMode.Remote;
+            string ReportMainPath2 = System.Configuration.ConfigurationManager.AppSettings["ReportServerPath"].ToString();
+            viewer.ServerReport.ReportServerUrl = new System.Uri(ReportMainPath2);
+
+            viewer.ServerReport.ReportPath = System.Configuration.ConfigurationManager.AppSettings["ReportsPath"].ToString() + "/Travel Expense Claim";
+            string TravelAuthorizationNumber = Decrypt(Request["TANO"]);
+            ReportParameter p = new ReportParameter("TravelAuthorizationNumber", TravelAuthorizationNumber);
+            viewer.ServerReport.SetParameters(new ReportParameter[] { p });
+            viewer.ServerReport.Refresh();
+
+            Export(viewer, "PDF", "Travel Expense Claim");
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    public bool Export(ReportViewer viewer, string exportType, string reportsTitle)
+    {
+        try
+        {
+            Warning[] warnings = null;
+            string[] streamIds = null;
+            string mimeType = string.Empty;
+            string encoding = string.Empty;
+            string extension = string.Empty;
+            string filetype = string.Empty;
+
+            filetype = "PDF";
+            byte[] bytes = viewer.ServerReport.Render(filetype, null, out mimeType, out encoding, out extension, out streamIds, out warnings);
+
+            Response.Clear();
+            Response.Buffer = true;
+            Response.Charset = "";
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.ContentType = "xls";
+            Response.AppendHeader("Content-Disposition", "attachment; filename=" + "TEC.Pdf");
+            Response.Flush();
+            Response.BinaryWrite(bytes);
+
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
+
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+        return true;
+    }
+    protected void ibDSABreakdown_Click(object sender, ImageClickEventArgs e)
+    {
+        try
+        {
+            FillGrids(true);
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void GVItinerary_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        try
+        {
+            if (e.CommandName == "Select")
+            {
+                lblArr.Text = GVItinerary.Rows[Convert.ToInt16(e.CommandArgument)].Cells[1].Text;
+                lblDate.Text = GVItinerary.Rows[Convert.ToInt16(e.CommandArgument)].Cells[2].Text;
+                DataTable dt = new DataTable();
+                TEC.InsertEmptyTECItineraryDSA(GVItinerary.DataKeys[Convert.ToInt16(e.CommandArgument)].Values["TravelItineraryID"].ToString());
+                hfDSAID.Value = GVItinerary.DataKeys[Convert.ToInt16(e.CommandArgument)].Values["TECItineraryID"].ToString();
+                hfDSATAID.Value = GVItinerary.DataKeys[Convert.ToInt16(e.CommandArgument)].Values["TravelItineraryID"].ToString();
+                FillDSAGrid();
+                FillGrids(true);
+                ClearDSA();
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    void FillDSAGrid()
+    {
+        try
+        {
+            DataTable dtDSA = new DataTable();
+            TEC.GetTECItineraryDSAByTECItineraryID(ref dtDSA, hfDSATAID.Value.ToString());
+            gvDSABreakdown.DataSource = dtDSA;
+            gvDSABreakdown.DataBind();
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void lnkAdd_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            float RateAmount, LocalAmount;
+            RateAmount = (float)Convert.ToDouble(txtDSARateDSA.Text) * (float)(Convert.ToDouble(txtPercentageDSA.Text) / 100) * (float)Convert.ToDouble(txtNoOfDaysDSA.Text);
+            LocalAmount = (float)Convert.ToDecimal(txtDSARateDSA.Text) * (float)(Convert.ToDecimal(txtPercentageDSA.Text) / 100) * (float)Convert.ToDecimal(txtNoOfDaysDSA.Text) * (float)Convert.ToDecimal(txtExchangeRate.Text);
+            TEC.InsertUpdateTECItineraryDSA("00000000-0000-0000-0000-000000000000", hfDSAID.Value.ToString(), (float)Convert.ToDecimal(txtNoOfDaysDSA.Text), (float)Convert.ToDecimal(txtDSARateDSA.Text), (float)Convert.ToDecimal(txtPercentageDSA.Text), RateAmount, (float)Convert.ToDecimal(txtExchangeRate.Text), LocalAmount);
+            FillDSAGrid();
+            FillGrids(true);
+            ClearDSA();
+            pnlDSAMsg.Visible = true;
+            lblDSAMsg.Text = "item has been added successfully";
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void gvDSABreakdown_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        try
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                LinkButton ibDelete = (LinkButton)e.Row.FindControl("ibDelete");
+                e.Row.Cells[0].Text = decimal.Round(Convert.ToDecimal(e.Row.Cells[0].Text), 2, MidpointRounding.AwayFromZero).ToString();
+                e.Row.Cells[1].Text = decimal.Round(Convert.ToDecimal(e.Row.Cells[1].Text), 2, MidpointRounding.AwayFromZero).ToString();
+                e.Row.Cells[2].Text = decimal.Round(Convert.ToDecimal(e.Row.Cells[2].Text), 2, MidpointRounding.AwayFromZero).ToString();
+                e.Row.Cells[3].Text = decimal.Round(Convert.ToDecimal(e.Row.Cells[3].Text), 2, MidpointRounding.AwayFromZero).ToString();
+                e.Row.Cells[4].Text = decimal.Round(Convert.ToDecimal(e.Row.Cells[4].Text), 2, MidpointRounding.AwayFromZero).ToString();
+
+                if (ddlStatusCode.SelectedItem.Text == "Completed")
+                {
+                    ibDelete.Visible = false;
+                    // gvDSABreakdown.Visible = false;
+                }
+                else
+                {
+                    ibDelete.Visible = true;
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void gvDSABreakdown_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        try
+        {
+            gvDSABreakdown.PageIndex = e.NewPageIndex;
+            FillDSAGrid();
+            FillGrids(true);
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+
+    }
+    protected void gvDSABreakdown_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        try
+        {
+            if (e.CommandName == "Delete")
+            {
+                TEC.DeleteTECItineraryDSA(gvDSABreakdown.DataKeys[Convert.ToInt16(e.CommandArgument)].Values["TECItineraryDSAID"].ToString(), gvDSABreakdown.DataKeys[Convert.ToInt16(e.CommandArgument)].Values["TECItineraryID"].ToString());
+                FillDSAGrid();
+                FillGrids(true);
+                ClearDSA();
+                pnlDSAMsg.Visible = true;
+                lblDSAMsg.Text = "item has been deleted successfully";
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void gvDSABreakdown_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+    }
+    void ClearDSA()
+    {
+        try
+        {
+            pnlDSAMsg.Visible = false;
+            txtDSARateDSA.Text = "";
+            txtNoOfDaysDSA.Text = "";
+            txtPercentageDSA.Text = "";
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    #region Upload
+    protected void ProcessUpload(object sender, AjaxControlToolkit.AsyncFileUploadEventArgs e)
+    {
+        try
+        {
+            string FileName = Path.GetFileName(e.FileName);
+            string FileNameOnly = Path.GetFileNameWithoutExtension(e.FileName);
+            string FileExtension = Path.GetExtension(e.FileName);
+
+            if (FileName != string.Empty)
+            {
+                Regex FilenameRegex = new Regex("(.*?)\\.(doc|docx|pdf|xls|xlsx|txt|png|jpg|jpeg|tiff|gif)$");
+                if ((FilenameRegex.IsMatch(FileName, Convert.ToInt16(RegexOptions.IgnoreCase))))
+                {
+
+                    Guid gname = default(Guid);
+                    gname = Guid.NewGuid();
+                    string nameAndType = "Expenses - " + FileNameOnly + FileExtension;
+                    string UploadFileName = "Expenses - " + FileNameOnly + " - " + gname.ToString() + FileExtension;
+                    if (!Directory.Exists(Server.MapPath("~\\UploadedFiles\\")))
+                    {
+                        System.IO.Directory.CreateDirectory(Server.MapPath("~\\UploadedFiles\\"));
+                    }
+                    if (int.Parse(e.FileSize) < 4194304)
+                    {
+                        fuAttachment.SaveAs(Server.MapPath("~\\UploadedFiles\\" + UploadFileName));
+                        if (e.State == AjaxControlToolkit.AsyncFileUploadState.Success)
+                        {
+                            Session["UploadFileName"] = UploadFileName;
+                            ScriptManager.RegisterClientScriptBlock(this, this.GetType(), gname.ToString(), "top.$get('ContentPlaceHolder1_hdnlblFileExt').value = '" + FileExtension + "'; top.$get('ContentPlaceHolder1_hdnNameOnly').value = '" + FileNameOnly + "'; top.$get('ContentPlaceHolder1_hfFileLoad').value = '" + ResolveClientUrl(UploadFileName) + "';", true);
+                            DataSet ds = new DataSet();
+                            TA.GetTravelAuthorizationByTravelAuthorizationNumber(ref ds, Decrypt(Request["TANO"]));
+                            Media.InsertTECExpensesFiles(ds.Tables[0].Rows[0][0].ToString(), lblTANo.Text, FileNameOnly, FileExtension, g.GetPhoto(Server.MapPath("~\\UploadedFiles\\" + UploadFileName)));
+                            //ScriptManager.RegisterClientScriptBlock(this, this.GetType(), gname.ToString(), "top.$get('ContentPlaceHolder1_hfFileLoad').value = '" + ResolveClientUrl(UploadFileName) + "';", true);                     
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void ibView_Click(object sender, ImageClickEventArgs e)
+    {
+        try
+        {
+            DataSet ds = new DataSet();
+            TA.GetTravelAuthorizationByTravelAuthorizationNumber(ref ds, Decrypt(Request["TANO"]));
+
+            string TravelAuthorizationNumber = Decrypt(Request["TANO"]);
+            string TravelAuthorizationID = ds.Tables[0].Rows[0][0].ToString(); ;
+
+            byte[] bytes = { 0 };
+            string fileName = "", contentType = "";
+
+            DataTable dt = new DataTable();
+
+            Media.GetTECExpensesFilesTAID(TravelAuthorizationID, ref dt);
+
+            foreach (DataRow row in dt.Rows)
+            {
+                bytes = (byte[])row["FileData"];
+                contentType = row["FileExtension"].ToString();
+                fileName = row["FileName"].ToString();
+            }
+
+            Response.Clear();
+            Response.Buffer = true;
+            Response.Charset = "";
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.ContentType = contentType;
+            Response.AppendHeader("Content-Disposition", "attachment; filename=" + fileName + contentType);
+            Response.BinaryWrite(bytes);
+            Response.Flush();
+            HttpContext.Current.ApplicationInstance.CompleteRequest();
+        }
+        catch (Exception ex)
+        {
+
+            IOM.Common.Logging.Log.WriteError(ex, System.Configuration.ConfigurationManager.AppSettings["ProjectID"].ToString());
+        }
+    }
+    protected void ibDelete_Click(object sender, ImageClickEventArgs e)
+    {
+        DataSet ds = new DataSet();
+        TA.GetTravelAuthorizationByTravelAuthorizationNumber(ref ds, Decrypt(Request["TANO"]));
+
+        string TravelAuthorizationNumber = Decrypt(Request["TANO"]);
+        string TravelAuthorizationID = ds.Tables[0].Rows[0][0].ToString(); ;
+
+        Media.DeleteTECExpensesFiles(TravelAuthorizationID);
+        lblUploadMsg.ForeColor = Color.Green;
+        fuAttachment.Style.Clear();
+        fuAttachment.Style.Add("display", "block");
+        pnlFile.Style.Clear();
+        pnlFile.Style.Add("display", "none");
+        lblUploadMsg.Text = "Item has been deleted successfully";
+
+    }
+    #endregion
+
+
+
+    #region status
+
+    protected void btnSaveStatus_Click(object sender, EventArgs e)
+    {
+        if (ddlStatusCode.SelectedIndex != 0)
+        {
+             string TravelAuthorizationNumber = "";
+            string TravelAuthorizationID = "";
+            TravelAuthorizationNumber = Decrypt(Request["TANO"]);
+            TravelAuthorizationID = ViewState["TAID"].ToString();
+            if (ddlStatusCode.SelectedItem.Text == "TA Incomplete")
+            {
+                
+                string RejectionReasons = "";
+
+                for (int i = 0; i <= lstRejectionReason.Items.Count - 1; i++)
+                {
+                    if (lstRejectionReason.Items[i].Selected)
+                    {
+                        TA.InsertRejectionReasons(TravelAuthorizationID, lstRejectionReason.Items[i].Value,"");
+                        RejectionReasons = RejectionReasons + "," + lstRejectionReason.Items[i].Text;
+
+                    }
+                }
+                TA.InsertTAStatus(TravelAuthorizationID, ddlStatusCode.SelectedValue.ToString(), RejectionReasons,"");
+            }
+            else
+            {
+             
+                TA.InsertTAStatus(TravelAuthorizationID, ddlStatusCode.SelectedValue.ToString(), "","");
+              
+            }
+            //TEC.UpdateTECStatus(Decrypt(Request["TANO"]), ddlStatusCode.SelectedValue, txtComments.Text);
+            lblStatusMsg.ForeColor = Color.Green;
+            lblStatusMsg.Text = "TEC Status has been updated successfully";
+            FillGrids(false);
+            if (ddlStatusCode.SelectedItem.Text == "Completed")
+            {
+                Divrate.Style.Add("Display", "none");
+            }
+            else
+            {
+                Divrate.Style.Add("Display", "block");
+            }
+        }
+        else
+        {
+            lblStatusMsg.ForeColor = Color.Red;
+            lblStatusMsg.Text = "Please select a status";
+            if (ddlStatusCode.SelectedItem.Text == "Completed")
+            {
+                Divrate.Style.Add("Display", "none");
+            }
+            else
+            {
+                Divrate.Style.Add("Display", "block");
+            }
+            FillGrids(false);
+        }
+    }
+    protected void ddlStatusCode_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (ddlStatusCode.SelectedItem.Text == "TA Incomplete")
+        {
+            RejectionReasonDiv.Style.Add("display", "block");
+            lstRejectionReason.Visible = true;
+
+        }
+        else
+        {
+            RejectionReasonDiv.Style.Add("display", "none");
+            lstRejectionReason.Visible = false;
+        }
+    }
+
+    private void FIllRejectionReason(string TravelAuthorizationID)
+    {
+
+        DataTable dtREjectionReasons = new DataTable();
+        TA.GetRejectionReason(TravelAuthorizationID, "",ref dtREjectionReasons);
+
+        for (int i = 0; i < dtREjectionReasons.Rows.Count; i++)
+        {
+            if (dtREjectionReasons.Rows[i]["RejectionReasonID"].ToString() == lstRejectionReason.Items[i].Value.ToString())
+            {
+                lstRejectionReason.Items[i].Selected = true;
+            }
+        }
+
+
+
+
+
+    }
+
+    #endregion  
+}
